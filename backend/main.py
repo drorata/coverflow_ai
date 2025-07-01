@@ -37,6 +37,7 @@ genai.configure(api_key=GOOGLE_API_KEY)
 
 model = genai.GenerativeModel("gemini-2.0-flash")
 
+
 async def verify_token(request: Request):
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
@@ -47,7 +48,10 @@ async def verify_token(request: Request):
         decoded_token = auth.verify_id_token(token)
         return decoded_token
     except Exception as e:
-        raise HTTPException(status_code=401, detail=f"Unauthorized: Invalid token ({e})")
+        raise HTTPException(
+            status_code=401, detail=f"Unauthorized: Invalid token ({e})"
+        )
+
 
 def extract_text_from_pdf(pdf_file: UploadFile) -> str:
     pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_file.file.read()))
@@ -56,26 +60,43 @@ def extract_text_from_pdf(pdf_file: UploadFile) -> str:
         text += pdf_reader.pages[page_num].extract_text()
     return text
 
+
 @app.get("/")
 async def hello_world():
     return {"message": "Hello World"}
 
 
 @app.post("/generate")
-async def generate_cover_letter(cv_file: UploadFile = File(...), job_description: str = File(...), sentiment: str = File(...), user: dict = Depends(verify_token)):
+async def generate_cover_letter(
+    cv_file: UploadFile = File(...),
+    job_description: str = File(...),
+    sentiment: str = File(...),
+    length: str = File(...),
+    user: dict = Depends(verify_token),
+):
     if cv_file.content_type == "application/pdf":
         cv_content = extract_text_from_pdf(cv_file)
-    elif cv_file.content_type == "text/plain" or cv_file.content_type == "text/markdown":
+    elif (
+        cv_file.content_type == "text/plain" or cv_file.content_type == "text/markdown"
+    ):
         cv_content = (await cv_file.read()).decode("utf-8")
     else:
-        raise HTTPException(status_code=400, detail="Unsupported file type for CV. Please upload a PDF, TXT, or MD file.")
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported file type for CV. Please upload a PDF, TXT, or MD file.",
+        )
 
     if not cv_content or not job_description:
         raise HTTPException(
             status_code=400, detail="CV content and job description are required"
         )
 
-    prompt = (        f"Given the following CV:\n{cv_content}\n\nAnd the following job "        f"description:\n{job_description}\n\nPlease generate a cover letter with a {sentiment} tone."    )
+    prompt = (
+        "You are a HR specialist and you need to formulate a cover letter based on the "
+        f"following CV:\n{cv_content}\n\nAnd the following job "
+        f"description:\n{job_description}\n\n"
+        f"Use the following tone: {sentiment} for the letter. The length of the letter should be {length}."
+    )
 
     try:
         response = model.generate_content(prompt)

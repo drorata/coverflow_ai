@@ -5,6 +5,7 @@ import CVUpload from './components/CVUpload';
 import JobDescriptionInput from './components/JobDescriptionInput';
 import CoverLetterDisplay from './components/CoverLetterDisplay';
 import SentimentSelector from './components/SentimentSelector';
+import LengthSelector from './components/LengthSelector';
 import { auth } from './firebaseConfig';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 
@@ -15,6 +16,7 @@ function App() {
   const [jobDescription, setJobDescription] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
   const [sentiment, setSentiment] = useState('Formal'); // New state for sentiment, default to Formal
+  const [length, setLength] = useState('Medium'); // New state for length, default to Medium
   const [user, setUser] = useState(null); // New state for user
 
   useEffect(() => {
@@ -46,6 +48,7 @@ function App() {
     formData.append('cv_file', cvFile);
     formData.append('job_description', jobDescription);
     formData.append('sentiment', sentiment);
+    formData.append('length', length);
 
     try {
       const response = await fetch('http://localhost:8000/generate', {
@@ -92,6 +95,7 @@ function App() {
           <CVUpload setCvFile={setCvFile} />
           <JobDescriptionInput setJobDescription={setJobDescription} />
           <SentimentSelector onSelectSentiment={setSentiment} currentSentiment={sentiment} />
+          <LengthSelector onSelectLength={setLength} currentLength={length} />
           <button onClick={generateCoverLetter} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Generate Cover Letter</button>
           <CoverLetterDisplay coverLetter={coverLetter} />
         </div>
