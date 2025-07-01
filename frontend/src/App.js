@@ -89,26 +89,50 @@ function App() {
   
 
   return (
-    <div className="container mx-auto mt-10">
-      <h1 className="text-2xl font-bold mb-5">CoverFlow AI</h1>
-      {user ? (
-        <div>
-          <p>Welcome, {user.email}</p>
-          <button onClick={handleSignOut} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-4">Sign Out</button>
-          <CVUpload setCvFile={setCvFile} />
-          <JobDescriptionInput setJobDescription={setJobDescription} />
-          <SentimentSelector onSelectSentiment={setSentiment} currentSentiment={sentiment} />
-          <LengthSelector onSelectLength={setLength} currentLength={length} />
-          <LanguageSelector onSelectLanguage={setLanguage} currentLanguage={language} />
-          <button onClick={generateCoverLetter} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Generate Cover Letter</button>
-          <CoverLetterDisplay coverLetter={coverLetter} />
-        </div>
-      ) : (
-        <div>
-          <SignUp />
-          <SignIn />
-        </div>
-      )}
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl">
+        <h1 className="text-4xl font-extrabold text-gray-800 mb-8 text-center">CoverFlow AI</h1>
+
+        {user ? (
+          <div className="space-y-8">
+            <div className="flex justify-between items-center pb-4 border-b border-gray-200">
+              <p className="text-lg text-gray-700">Welcome, <span className="font-semibold">{user.email}</span>!</p>
+              <button
+                onClick={handleSignOut}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-200 ease-in-out"
+              >
+                Sign Out
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <CVUpload setCvFile={setCvFile} />
+                <JobDescriptionInput setJobDescription={setJobDescription} />
+              </div>
+              <div className="space-y-6">
+                <SentimentSelector onSelectSentiment={setSentiment} currentSentiment={sentiment} />
+                <LengthSelector onSelectLength={setLength} currentLength={length} />
+                <LanguageSelector onSelectLanguage={setLanguage} currentLanguage={language} />
+              </div>
+            </div>
+
+            <button
+              onClick={generateCoverLetter}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out transform hover:scale-105"
+            >
+              Generate Cover Letter
+            </button>
+
+            <CoverLetterDisplay coverLetter={coverLetter} />
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <SignUp />
+            <SignIn />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

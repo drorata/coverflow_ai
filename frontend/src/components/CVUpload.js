@@ -16,10 +16,19 @@ function CVUpload({ setCvFile }) { // Renamed prop to setCvFile
     };
 
     return (
-        <div>
-            <h2>CV Upload</h2>
-            <input type="file" accept=".pdf,.txt,.md" onChange={handleFileChange} className="mb-4" />
-            {uploadStatus && <p>{uploadStatus}</p>}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Upload CV</h2>
+            <label className="block mb-2 text-sm font-medium text-gray-700" htmlFor="cv_upload">
+                Select your CV (PDF, TXT, MD):
+            </label>
+            <input
+                type="file"
+                accept=".pdf,.txt,.md"
+                onChange={handleFileChange}
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                id="cv_upload"
+            />
+            {uploadStatus && <p className="mt-3 text-sm text-gray-600">{uploadStatus}</p>}
         </div>
     );
 }
