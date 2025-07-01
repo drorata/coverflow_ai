@@ -72,6 +72,7 @@ async def generate_cover_letter(
     job_description: str = File(...),
     sentiment: str = File(...),
     length: str = File(...),
+    language: str = File(...),
     user: dict = Depends(verify_token),
 ):
     if cv_file.content_type == "application/pdf":
@@ -95,7 +96,11 @@ async def generate_cover_letter(
         "You are a HR specialist and you need to formulate a cover letter based on the "
         f"following CV:\n{cv_content}\n\nAnd the following job "
         f"description:\n{job_description}\n\n"
-        f"Use the following tone: {sentiment} for the letter. The length of the letter should be {length}."
+        f"Use the following tone: {sentiment} for the letter. "
+        f"The length of the letter should be {length}. "
+        f"The language of the letter should be {language}. "
+        "The result should be provided as valid Markdown. "
+        "Separate sentences with line breaks for easier readability of the text."
     )
 
     try:
