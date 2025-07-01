@@ -1,5 +1,7 @@
 backend/.venv/
 __pycache__/
+.vscode/
+
 
 .env
 serviceAccountKey.json
