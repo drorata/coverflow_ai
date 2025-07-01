@@ -10,8 +10,6 @@ import LanguageSelector from './components/LanguageSelector';
 import { auth } from './firebaseConfig';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 
-
-
 function App() {
   const [cvFile, setCvFile] = useState(null); // New state for CV File object
   const [jobDescription, setJobDescription] = useState('');
@@ -20,6 +18,7 @@ function App() {
   const [length, setLength] = useState('Medium'); // New state for length, default to Medium
   const [language, setLanguage] = useState('English'); // New state for language, default to English
   const [user, setUser] = useState(null); // New state for user
+  const [isLoading, setIsLoading] = useState(false); // New state for loading indicator
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -44,16 +43,19 @@ function App() {
       return;
     }
 
-    const idToken = await user.getIdToken();
-
-    const formData = new FormData();
-    formData.append('cv_file', cvFile);
-    formData.append('job_description', jobDescription);
-    formData.append('sentiment', sentiment);
-    formData.append('length', length);
-    formData.append('language', language);
+    setIsLoading(true); // Set loading to true
+    setCoverLetter(''); // Clear previous cover letter
 
     try {
+      const idToken = await user.getIdToken();
+
+      const formData = new FormData();
+      formData.append('cv_file', cvFile);
+      formData.append('job_description', jobDescription);
+      formData.append('sentiment', sentiment);
+      formData.append('length', length);
+      formData.append('language', language);
+
       const response = await fetch('http://localhost:8000/generate', {
         method: 'POST',
         mode: 'cors',
@@ -73,6 +75,8 @@ function App() {
     } catch (error) {
       console.error('Error generating cover letter:', error);
       alert(`Error: ${error.message}`);
+    } finally {
+      setIsLoading(false); // Set loading to false regardless of success or failure
     }
   };
 
@@ -85,8 +89,6 @@ function App() {
       alert('Error signing out.');
     });
   };
-
-  
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
@@ -119,9 +121,20 @@ function App() {
 
             <button
               onClick={generateCoverLetter}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out transform hover:scale-105"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
-              Generate Cover Letter
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Generating...
+                </span>
+              ) : (
+                'Generate Cover Letter'
+              )}
             </button>
 
             <CoverLetterDisplay coverLetter={coverLetter} />
