@@ -1,0 +1,15 @@
+## Software Engineer
+
+We are looking for a talented software engineer to join our team. The ideal candidate should have experience with JavaScript, React, and Node.js. Experience with Python and SQL is a plus.
+
+## Responsibilities
+
+*   Develop and maintain web applications
+*   Write clean and efficient code
+*   Work collaboratively with other engineers
+
+## Qualifications
+
+*   Bachelor's degree in computer science or related field
+*   3+ years of experience in software engineering
+*   Proficiency in JavaScript, React, and Node.js
