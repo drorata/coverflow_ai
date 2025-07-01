@@ -8,6 +8,7 @@ import firebase_admin
 from firebase_admin import credentials, auth
 import PyPDF2
 import io
+import json
 
 app = FastAPI()
 
@@ -25,12 +26,12 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     raise ValueError("No GOOGLE_API_KEY environment variable found")
 
-FIREBASE_SERVICE_ACCOUNT_KEY_PATH = os.getenv("FIREBASE_SERVICE_ACCOUNT_KEY_PATH")
-if not FIREBASE_SERVICE_ACCOUNT_KEY_PATH:
-    raise ValueError("No FIREBASE_SERVICE_ACCOUNT_KEY_PATH environment variable found")
+FIREBASE_SERVICE_ACCOUNT_JSON = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
+if not FIREBASE_SERVICE_ACCOUNT_JSON:
+    raise ValueError("No FIREBASE_SERVICE_ACCOUNT_JSON environment variable found")
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_KEY_PATH)
+cred = credentials.Certificate(json.loads(FIREBASE_SERVICE_ACCOUNT_JSON))
 firebase_admin.initialize_app(cred)
 
 genai.configure(api_key=GOOGLE_API_KEY)
