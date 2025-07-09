@@ -93,42 +93,44 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl">
-        <h1 className="text-4xl font-extrabold text-gray-800 mb-8 text-center">CoverFlow AI</h1>
+    <div className="min-h-screen bg-gradient-to-tr from-gray-700 to-blue-900 flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white p-8 sm:p-10 rounded-xl shadow-2xl w-full max-w-4xl transform transition-all duration-300 hover:shadow-3xl">
+        <h1 className="text-5xl font-extrabold text-gray-900 mb-10 text-center tracking-tight">CoverFlow AI</h1>
 
         {user ? (
-          <div className="space-y-8">
-            <div className="flex justify-between items-center pb-4 border-b border-gray-200">
-              <p className="text-lg text-gray-700">Welcome, <span className="font-semibold">{user.email}</span>!</p>
+          <div className="space-y-10">
+            <div className="flex justify-between items-center pb-6 border-b border-gray-200">
+              <p className="text-lg text-gray-700">Welcome, <span className="font-semibold text-indigo-600">{user.email}</span>!</p>
               <button
                 onClick={handleSignOut}
-                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-200 ease-in-out"
+                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:-translate-y-0.5"
               >
                 Sign Out
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
+            <div className="p-6 bg-blue-50 border border-blue-200 rounded-xl shadow-inner space-y-6">
                 <CVUpload setCvFile={setCvFile} />
                 <JobDescriptionInput setJobDescription={setJobDescription} />
-              </div>
-              <div className="space-y-6">
-                <SentimentSelector onSelectSentiment={setSentiment} currentSentiment={sentiment} />
-                <LengthSelector onSelectLength={setLength} currentLength={length} />
-                <LanguageSelector onSelectLanguage={setLanguage} currentLanguage={language} />
-              </div>
+            </div>
+
+            <div className="p-6 bg-blue-50 border border-blue-200 rounded-xl shadow-inner space-y-6">
+                <h3 className="text-xl font-bold text-blue-800 mb-4">Customize Your Cover Letter</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <SentimentSelector onSelectSentiment={setSentiment} currentSentiment={sentiment} />
+                  <LengthSelector onSelectLength={setLength} currentLength={length} />
+                  <LanguageSelector onSelectLanguage={setLanguage} currentLanguage={language} />
+                </div>
             </div>
 
             <button
               onClick={generateCoverLetter}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-6 rounded-xl text-xl shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:opacity-60 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -139,10 +141,12 @@ function App() {
               )}
             </button>
 
-            <CoverLetterDisplay coverLetter={coverLetter} />
+            {!isLoading && coverLetter && (
+              <CoverLetterDisplay coverLetter={coverLetter} />
+            )}
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <SignUp />
             <SignIn />
           </div>
