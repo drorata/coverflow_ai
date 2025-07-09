@@ -109,17 +109,19 @@ function App() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
+            <div className="space-y-6">
                 <CVUpload setCvFile={setCvFile} />
                 <JobDescriptionInput setJobDescription={setJobDescription} />
               </div>
-              <div className="space-y-6">
-                <SentimentSelector onSelectSentiment={setSentiment} currentSentiment={sentiment} />
-                <LengthSelector onSelectLength={setLength} currentLength={length} />
-                <LanguageSelector onSelectLanguage={setLanguage} currentLanguage={language} />
+
+              <div className="p-6 border rounded-lg shadow-sm bg-gray-50 space-y-4">
+                <h3 className="text-lg font-semibold text-gray-700">Cover Letter Customization</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <SentimentSelector onSelectSentiment={setSentiment} currentSentiment={sentiment} />
+                  <LengthSelector onSelectLength={setLength} currentLength={length} />
+                  <LanguageSelector onSelectLanguage={setLanguage} currentLanguage={language} />
+                </div>
               </div>
-            </div>
 
             <button
               onClick={generateCoverLetter}
@@ -139,7 +141,9 @@ function App() {
               )}
             </button>
 
-            <CoverLetterDisplay coverLetter={coverLetter} />
+            {!isLoading && coverLetter && (
+              <CoverLetterDisplay coverLetter={coverLetter} />
+            )}
           </div>
         ) : (
           <div className="space-y-6">
