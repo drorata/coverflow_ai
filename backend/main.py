@@ -8,29 +8,39 @@ import firebase_admin
 from firebase_admin import credentials, auth
 import PyPDF2
 import io
+import json
+
+load_dotenv()
 
 app = FastAPI()
 
+# CORS Configuration: Read allowed origins from environment variable
+# The variable should be a comma-separated list of URLs.
+# Example: CORS_ALLOWED_ORIGINS=http://localhost:3000,https://your-frontend-domain.com
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS")
+origins = []
+if CORS_ALLOWED_ORIGINS:
+    origins = [origin.strip() for origin in CORS_ALLOWED_ORIGINS.split(",")]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
 
-load_dotenv()
-
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
     raise ValueError("No GOOGLE_API_KEY environment variable found")
 
-FIREBASE_SERVICE_ACCOUNT_KEY_PATH = os.getenv("FIREBASE_SERVICE_ACCOUNT_KEY_PATH")
-if not FIREBASE_SERVICE_ACCOUNT_KEY_PATH:
-    raise ValueError("No FIREBASE_SERVICE_ACCOUNT_KEY_PATH environment variable found")
+FIREBASE_SERVICE_ACCOUNT_JSON = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
+if not FIREBASE_SERVICE_ACCOUNT_JSON:
+    raise ValueError("No FIREBASE_SERVICE_ACCOUNT_JSON environment variable found")
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_KEY_PATH)
+cred = credentials.Certificate(json.loads(FIREBASE_SERVICE_ACCOUNT_JSON))
 firebase_admin.initialize_app(cred)
 
 genai.configure(api_key=GOOGLE_API_KEY)
