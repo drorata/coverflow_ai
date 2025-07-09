@@ -10,17 +10,26 @@ import PyPDF2
 import io
 import json
 
+load_dotenv()
+
 app = FastAPI()
+
+# CORS Configuration: Read allowed origins from environment variable
+# The variable should be a comma-separated list of URLs.
+# Example: CORS_ALLOWED_ORIGINS=http://localhost:3000,https://your-frontend-domain.com
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS")
+origins = []
+if CORS_ALLOWED_ORIGINS:
+    origins = [origin.strip() for origin in CORS_ALLOWED_ORIGINS.split(",")]
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
-
-load_dotenv()
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not GOOGLE_API_KEY:
