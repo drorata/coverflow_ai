@@ -56,7 +56,9 @@ function App() {
       formData.append('length', length);
       formData.append('language', language);
 
-      const response = await fetch('http://localhost:8000/generate', {
+      const backendApiUrl = `${process.env.REACT_APP_BACKEND_URL}/generate`;
+
+      const response = await fetch(backendApiUrl, {
         method: 'POST',
         mode: 'cors',
         headers: {
