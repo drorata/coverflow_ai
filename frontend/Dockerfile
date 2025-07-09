@@ -4,6 +4,10 @@ FROM node:20-alpine AS build
 # Set the working directory
 WORKDIR /app
 
+# Make the backend URL a build-time argument and environment variable
+ARG REACT_APP_BACKEND_URL
+ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
+
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
