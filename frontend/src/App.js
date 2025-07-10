@@ -9,6 +9,11 @@ import LengthSelector from './components/LengthSelector';
 import LanguageSelector from './components/LanguageSelector';
 import { auth } from './firebaseConfig';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMugHot } from '@fortawesome/free-solid-svg-icons';
+import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
+
+
 
 function App() {
   const [cvFile, setCvFile] = useState(null); // New state for CV File object
@@ -109,18 +114,32 @@ function App() {
               </button>
             </div>
 
-            <div className="p-6 bg-blue-50 border border-blue-200 rounded-xl shadow-inner space-y-6">
-                <CVUpload setCvFile={setCvFile} />
-                <JobDescriptionInput setJobDescription={setJobDescription} />
+            <div className="text-center p-4 bg-gray-100 rounded-lg">
+              <p className="text-sm text-gray-600 mb-2">This project was created by Dror Atariah</p>
+              <div className="flex flex-col items-center space-y-2">
+                <a href="https://coff.ee/drorata" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 font-semibold">
+                  <FontAwesomeIcon icon={faMugHot} className="mr-1" />
+                  Buy me a coffee
+                </a>
+                <a href="https://linkedin.com/in/atariah" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 font-semibold">
+                  <FontAwesomeIcon icon={faLinkedinIn} className="mr-1" />
+                  LinkedIn
+                </a>
+              </div>
             </div>
 
             <div className="p-6 bg-blue-50 border border-blue-200 rounded-xl shadow-inner space-y-6">
-                <h3 className="text-xl font-bold text-blue-800 mb-4">Customize Your Cover Letter</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <SentimentSelector onSelectSentiment={setSentiment} currentSentiment={sentiment} />
-                  <LengthSelector onSelectLength={setLength} currentLength={length} />
-                  <LanguageSelector onSelectLanguage={setLanguage} currentLanguage={language} />
-                </div>
+              <CVUpload setCvFile={setCvFile} />
+              <JobDescriptionInput setJobDescription={setJobDescription} />
+            </div>
+
+            <div className="p-6 bg-blue-50 border border-blue-200 rounded-xl shadow-inner space-y-6">
+              <h3 className="text-xl font-bold text-blue-800 mb-4">Customize Your Cover Letter</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <SentimentSelector onSelectSentiment={setSentiment} currentSentiment={sentiment} />
+                <LengthSelector onSelectLength={setLength} currentLength={length} />
+                <LanguageSelector onSelectLanguage={setLanguage} currentLanguage={language} />
+              </div>
             </div>
 
             <button
