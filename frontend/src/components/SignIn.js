@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../firebaseConfig';
+import AnonymousSignIn from './AnonymousSignIn';
 
 function SignIn() {
     const [email, setEmail] = useState('');
@@ -63,6 +64,9 @@ function SignIn() {
                     {message}
                 </p>
             )}
+            <div className="mt-4 text-center">
+                <AnonymousSignIn />
+            </div>
         </div>
     );
 }

@@ -166,7 +166,7 @@ function App() {
         {user ? (
           <div className="space-y-10">
             <div className="flex justify-between items-center pb-6 border-b border-gray-200">
-              <p className="text-lg text-gray-700">Welcome, <span className="font-semibold text-indigo-600">{user.email}</span>!</p>
+              <p className="text-lg text-gray-700">Welcome, <span className="font-semibold text-indigo-600">{user.isAnonymous ? 'Guest' : user.email}</span>!</p>
               <button
                 onClick={handleSignOut}
                 className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:-translate-y-0.5"
