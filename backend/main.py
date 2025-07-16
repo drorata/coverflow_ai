@@ -9,10 +9,17 @@ from firebase_admin import credentials, auth
 import PyPDF2
 import io
 import json
+import logfire
 
 load_dotenv()
 
 app = FastAPI()
+logfire.configure(
+    environment=os.getenv("COVERFLOW_AI_BACKEND_ENV"),
+    token=os.getenv("COVERFLOW_AI_LOGFIRE_TOKEN"),
+)
+logfire.info("Backend started")
+logfire.instrument_fastapi(app, capture_headers=True)
 
 # CORS Configuration: Read allowed origins from environment variable
 # The variable should be a comma-separated list of URLs.
@@ -117,5 +124,54 @@ async def generate_cover_letter(
         response = model.generate_content(prompt)
         cover_letter = response.text
         return JSONResponse({"cover_letter": cover_letter})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/refine")
+async def refine_cover_letter(
+    cv_file: UploadFile = File(...),
+    job_description: str = File(...),
+    sentiment: str = File(...),
+    length: str = File(...),
+    language: str = File(...),
+    cover_letter: str = File(...),
+    refinement_instructions: str = File(...),
+    user: dict = Depends(verify_token),
+):
+    if cv_file.content_type == "application/pdf":
+        cv_content = extract_text_from_pdf(cv_file)
+    elif (
+        cv_file.content_type == "text/plain" or cv_file.content_type == "text/markdown"
+    ):
+        cv_content = (await cv_file.read()).decode("utf-8")
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported file type for CV. Please upload a PDF, TXT, or MD file.",
+        )
+
+    if not cv_content or not job_description:
+        raise HTTPException(
+            status_code=400, detail="CV content and job description are required"
+        )
+
+    prompt = (
+        "You are an HR specialist and you need to refine a cover letter based on the "
+        f"following CV:\n{cv_content}\n\nAnd the following job "
+        f"description:\n{job_description}\n\nHere is the original cover "
+        f"letter:\n{cover_letter}\n\nAnd here are the refinement "
+        f"instructions:\n{refinement_instructions}\n\n"
+        f"Use the following tone: {sentiment} for the letter. "
+        f"The length of the letter should be {length}. "
+        f"The language of the letter should be {language}. "
+        "The result should be provided as valid Markdown. "
+        "Separate sentences with line breaks for easier readability of the text."
+    )
+
+    try:
+        response = model.generate_content(prompt)
+        refined_cover_letter = response.text
+        return JSONResponse({"cover_letter": refined_cover_letter})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

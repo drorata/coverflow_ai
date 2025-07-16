@@ -4,6 +4,7 @@ import SignIn from './components/SignIn';
 import CVUpload from './components/CVUpload';
 import JobDescriptionInput from './components/JobDescriptionInput';
 import CoverLetterDisplay from './components/CoverLetterDisplay';
+import RefinementInput from './components/RefinementInput';
 import SentimentSelector from './components/SentimentSelector';
 import LengthSelector from './components/LengthSelector';
 import LanguageSelector from './components/LanguageSelector';
@@ -12,6 +13,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMugHot } from '@fortawesome/free-solid-svg-icons';
 import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
+import logo from './logo.png';
 
 
 
@@ -24,6 +26,7 @@ function App() {
   const [language, setLanguage] = useState('English'); // New state for language, default to English
   const [user, setUser] = useState(null); // New state for user
   const [isLoading, setIsLoading] = useState(false); // New state for loading indicator
+  const [refinementText, setRefinementText] = useState(''); // New state for refinement text
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -78,12 +81,67 @@ function App() {
       }
 
       const data = await response.json();
-      setCoverLetter(data.cover_letter);
+      const cleanedLetter = data.cover_letter.replace(/^```(?:markdown)?\s*|```\s*$/g, '').trim();
+      setCoverLetter(cleanedLetter);
     } catch (error) {
       console.error('Error generating cover letter:', error);
       alert(`Error: ${error.message}`);
     } finally {
       setIsLoading(false); // Set loading to false regardless of success or failure
+    }
+  };
+
+  const refineCoverLetter = async () => {
+    if (!user) {
+      alert('Please sign in to refine a cover letter.');
+      return;
+    }
+
+    if (!refinementText.trim()) {
+      alert('Please provide refinement instructions.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const idToken = await user.getIdToken();
+
+      const formData = new FormData();
+      formData.append('cv_file', cvFile);
+      formData.append('job_description', jobDescription);
+      formData.append('sentiment', sentiment);
+      formData.append('length', length);
+      formData.append('language', language);
+      formData.append('cover_letter', coverLetter);
+      formData.append('refinement_instructions', refinementText);
+
+
+      const backendApiUrl = `${process.env.REACT_APP_BACKEND_URL}/refine`;
+
+      const response = await fetch(backendApiUrl, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Authorization': `Bearer ${idToken}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to refine cover letter');
+      }
+
+      const data = await response.json();
+      const cleanedLetter = data.cover_letter.replace(/^```(?:markdown)?\s*|```\s*$/g, '').trim();
+      setCoverLetter(cleanedLetter);
+      setRefinementText(''); // Clear the refinement text input
+    } catch (error) {
+      console.error('Error refining cover letter:', error);
+      alert(`Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,7 +158,10 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-tr from-gray-700 to-blue-900 flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="bg-white p-8 sm:p-10 rounded-xl shadow-2xl w-full max-w-4xl transform transition-all duration-300 hover:shadow-3xl">
-        <h1 className="text-5xl font-extrabold text-gray-900 mb-10 text-center tracking-tight">CoverFlow AI</h1>
+        <div className="flex justify-center items-center mb-10">
+          <img src={logo} alt="CoverFlow AI Logo" className="h-12 w-12 mr-4"/>
+          <h1 className="text-5xl font-extrabold text-gray-900 text-center tracking-tight">CoverFlow AI</h1>
+        </div>
 
         {user ? (
           <div className="space-y-10">
@@ -115,16 +176,14 @@ function App() {
             </div>
 
             <div className="text-center p-4 bg-gray-100 rounded-lg">
-              <p className="text-sm text-gray-600 mb-2">This project was created by Dror Atariah</p>
-              <div className="flex flex-col items-center space-y-2">
-                <a href="https://coff.ee/drorata" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 font-semibold">
-                  <FontAwesomeIcon icon={faMugHot} className="mr-1" />
-                  Buy me a coffee
-                </a>
+              🎯 This project was created by <i>Dror Atariah</i> 🎯
+              <div className="flex justify-center items-center space-x-4">
+                <p>🚀</p><a href="https://coff.ee/drorata" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 font-semibold">
+                  <FontAwesomeIcon icon={faMugHot} className="mr-1" /> Buy me a coffee
+                </a><p>🚀</p>
                 <a href="https://linkedin.com/in/atariah" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 font-semibold">
-                  <FontAwesomeIcon icon={faLinkedinIn} className="mr-1" />
-                  LinkedIn
-                </a>
+                  <FontAwesomeIcon icon={faLinkedinIn} className="mr-1" /> LinkedIn
+                </a><p>🚀</p>
               </div>
             </div>
 
@@ -161,7 +220,16 @@ function App() {
             </button>
 
             {!isLoading && coverLetter && (
-              <CoverLetterDisplay coverLetter={coverLetter} />
+              <CoverLetterDisplay coverLetter={coverLetter} onCoverLetterChange={(e) => setCoverLetter(e.target.value)} />
+            )}
+
+            {coverLetter && !isLoading && (
+              <RefinementInput
+                value={refinementText}
+                onChange={(e) => setRefinementText(e.target.value)}
+                onSubmit={refineCoverLetter}
+                isLoading={isLoading}
+              />
             )}
           </div>
         ) : (
@@ -171,6 +239,9 @@ function App() {
           </div>
         )}
       </div>
+      <footer className="text-center text-white mt-8">
+        <p>Made with ❤️ in Berlin</p>
+      </footer>
     </div>
   );
 }
